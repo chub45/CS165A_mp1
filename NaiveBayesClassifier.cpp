@@ -104,6 +104,12 @@ int main(int argc, char **argv)
 			totalNumDocs++;
 		}
 	}
+
+	for(int i = 1; i < 16; i++)
+	{
+		classes[i]->p_c = double(classes[i]->totalClassDocs) / double(totalNumDocs);
+	}
+
 	int stop_learn = clock();
 	int learnTime = ceil((stop_learn - start_learn) / double(CLOCKS_PER_SEC));
 
@@ -181,12 +187,16 @@ int main(int argc, char **argv)
 			{
 				if(classes[i]->freqOfWords.find(x.first) == classes[i]->freqOfWords.end())
 				{
-					totalProduct += log(double(1) / double(classes[i]->totalWordsInDocs) + 1);
+					totalProduct += log(double(1) / double(classes[i]->totalWordsInDocs + x.second) + 1);
 				}
 				else
 				{
-					totalProduct += log(double(classes[i]->freqOfWords[x.first]) / double(classes[i]->totalWordsInDocs + abs(classes[i]->freqOfWords[x.first] - x.second)) + 1);
+					if(classes[i]->freqOfWords[x.first] > 1 || classes[i]->freqOfWords[x.first] == x.second)
+					{
+						totalProduct += log(double(classes[i]->freqOfWords[x.first]) / double(classes[i]->totalWordsInDocs + abs(classes[i]->freqOfWords[x.first] - x.second)) + 1);
+					}
 				}
+				totalProduct += log(x.second + 1);
 			}
 			if(maxProb < totalProduct)
 			{
@@ -270,7 +280,7 @@ int main(int argc, char **argv)
 		
 		//Go through each word in set and estimate prob of each class
 		//Also, store the label after calculating
-		
+
 		vector<double> probClasses(16, 0.0);
 		double maxProb = 0.0;
 		int assignedDoc = 0;
@@ -281,11 +291,14 @@ int main(int argc, char **argv)
 			{
 				if(classes[i]->freqOfWords.find(x.first) == classes[i]->freqOfWords.end())
 				{
-					totalProduct += log(double(1) / double(classes[i]->totalWordsInDocs) + 1);
+					totalProduct += log(double(1) / double(classes[i]->totalWordsInDocs + x.second) + 1);
 				}
 				else
 				{
-					totalProduct += log(double(classes[i]->freqOfWords[x.first]) / double(classes[i]->totalWordsInDocs + abs(classes[i]->freqOfWords[x.first] - x.second)) + 1);
+					if(classes[i]->freqOfWords[x.first] > 1 || classes[i]->freqOfWords[x.first] == x.second)
+					{
+						totalProduct += log(double(classes[i]->freqOfWords[x.first]) / double(classes[i]->totalWordsInDocs + abs(classes[i]->freqOfWords[x.first] - x.second)) + 1);
+					}
 				}
 			}
 			if(maxProb < totalProduct)
